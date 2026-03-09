@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import f1_score
 
-from Config import (
+from config import (
     WFV_INITIAL_TRAIN_MONTHS,
     WFV_STEP_MONTHS,
     WFV_THRESHOLD_PCT,
@@ -19,7 +19,7 @@ from Config import (
     N_REGIMES,
     RANDOM_STATE,
 )
-from regime import extract_posteriors
+from src.models.regime import extract_posteriors
 
 warnings.filterwarnings("ignore")
 

@@ -5,7 +5,7 @@
 import pandas as pd
 import numpy as np
 
-from Config import TRAIN_END_DATE, TEST_START_DATE, THRESHOLD_PERCENTILE
+from config import TRAIN_END_DATE, TEST_START_DATE, THRESHOLD_PERCENTILE
 
 
 def apply_labels(future_ret: pd.Series, threshold: float) -> pd.Series:

@@ -5,7 +5,7 @@
 import numpy as np
 import pandas as pd
 
-from Config import (
+from config import (
     COST_BPS,
     ANNUAL_FACTOR,
     CONF_THRESHOLD,

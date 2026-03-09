@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from hmmlearn.hmm import GaussianHMM
 
-from Config import N_REGIMES, REGIME_NAMES, REGIME_COLS_KW, RANDOM_STATE
+from config import N_REGIMES, REGIME_NAMES, REGIME_COLS_KW, RANDOM_STATE
 
 
 def _stable_regime_labels(model, train_regimes, test_regimes, vol_col_idx=0):

@@ -6,7 +6,7 @@ import time
 import pandas as pd
 import requests
 
-from Config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
+from config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
 
 
 def get_binance_data(

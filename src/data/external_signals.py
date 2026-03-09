@@ -7,7 +7,7 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime
 
-from Config import DATA_START
+from config import DATA_START
 
 
 def get_external_signals(

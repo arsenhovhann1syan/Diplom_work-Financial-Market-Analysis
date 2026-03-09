@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 
-from Config import (
+from config import (
     CORRELATION_THRESHOLD,
     MDI_THRESHOLD,
     PI_THRESHOLD,
