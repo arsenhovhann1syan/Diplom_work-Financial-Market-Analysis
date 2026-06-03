@@ -9,7 +9,7 @@ import requests
 try:
     from src.config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
 except ModuleNotFoundError:
-    from config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
+    from src.config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
 
 def get_binance_data(
     symbol: str = SYMBOL,

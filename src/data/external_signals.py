@@ -10,7 +10,7 @@ from datetime import datetime
 try:
     from src.config import DATA_START
 except ModuleNotFoundError:
-    from config import DATA_START
+    from src.config import DATA_START
 
 def get_external_signals(
     start_str: str = DATA_START,
