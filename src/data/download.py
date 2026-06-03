@@ -6,8 +6,10 @@ import time
 import pandas as pd
 import requests
 
-from config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
-
+try:
+    from src.config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
+except ModuleNotFoundError:
+    from config import SYMBOL, INTERVAL, DATA_START, RAW_DATA_PATH
 
 def get_binance_data(
     symbol: str = SYMBOL,
