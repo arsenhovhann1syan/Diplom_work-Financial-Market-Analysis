@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import f1_score
 
-from config import (
+from src.config import (
     WFV_INITIAL_TRAIN_MONTHS,
     WFV_STEP_MONTHS,
     WFV_THRESHOLD_PCT,

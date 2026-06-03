@@ -13,7 +13,7 @@ from sklearn.metrics import (
     accuracy_score, f1_score, classification_report, confusion_matrix,
 )
 
-from config import HPO_N_TRIALS, HPO_VAL_FRAC, RANDOM_STATE
+from src.config import HPO_N_TRIALS, HPO_VAL_FRAC, RANDOM_STATE
 
 warnings.filterwarnings("ignore")
 optuna.logging.set_verbosity(optuna.logging.WARNING)
