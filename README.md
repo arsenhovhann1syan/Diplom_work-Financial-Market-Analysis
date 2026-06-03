@@ -1,112 +1,194 @@
-# Ֆինանսական շուկաների վերլուծություն արհեստական բանականության միջոցով
+# Financial Market Analysis Using Artificial Intelligence
 
-Այս նախագիծը նվիրված է ֆինանսական շուկաների, մասնավորապես Bitcoin-ի գնի շարժման ուղղության վերլուծությանը և կանխատեսմանը՝ օգտագործելով մեքենայական ուսուցման և արհեստական բանականության մեթոդներ։
+## Overview
 
-Նախագծի հիմնական նպատակը շուկայի աճի, անկման և չեզոք շարժերի հայտնաբերումն է՝ հիմնվելով պատմական տվյալների, տեխնիկական ցուցանիշների և արտաքին շուկայական ազդանշանների վրա։
+This repository contains my Bachelor's thesis project in Applied Mathematics, focused on Bitcoin market analysis and direction prediction using Machine Learning and Artificial Intelligence techniques.
 
----
+The project investigates whether historical market data, technical indicators, and external financial signals can be used to identify and predict future market movements. The primary objective is to classify the next-day Bitcoin market direction into three categories:
 
-# Նախագծի հիմնական գաղափարը
+* **UP**
+* **DOWN**
+* **NEUTRAL**
 
-Ֆինանսական շուկաները բնութագրվում են բարձր տատանողականությամբ, ոչ գծային վարքագծով և արագ փոփոխվող պայմաններով։ Այդ պատճառով միայն դասական գծային մոդելները հաճախ բավարար չեն շուկայի բարդ կառուցվածքը նկարագրելու համար։
-
-Այս նախագծում կիրառվել են մեքենայական ուսուցման մեթոդներ, տեխնիկական ցուցանիշներ և շուկայի ռեժիմների վերլուծություն՝ Bitcoin-ի գնի շարժման ուղղությունը գնահատելու նպատակով։
-
----
-
-# Նախագծում իրականացված փուլերը
-
-- BTC OHLCV տվյալների հավաքագրում Binance API-ից
-- Արտաքին շուկայական ազդանշանների ավելացում
-  - Fear & Greed Index
-  - S&P 500
-  - VIX
-- Տվյալների մշակում և մաքրում
-- Exploratory Data Analysis (EDA)
-- Feature Engineering
-- Feature Selection
-- Train / Test բաժանում
-- Hidden Markov Model (HMM) միջոցով շուկայի ռեժիմների հայտնաբերում
-- Machine Learning մոդելների ուսուցում
-- Մոդելների գնահատում և համեմատություն
-- Ֆինանսական ռազմավարությունների վերլուծություն
+The project combines statistical analysis, feature engineering, regime detection, machine learning models, and MLOps components to create an end-to-end predictive pipeline.
 
 ---
 
-# Օգտագործված տեխնոլոգիաներ և գրադարաններ
+## Research Motivation
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- LightGBM
-- hmmlearn
-- Matplotlib
-- Seaborn
-- yfinance
-- Binance API
+Financial markets are highly dynamic, non-linear, and influenced by numerous interacting factors. Traditional linear approaches often struggle to capture complex market behavior.
+
+This research explores how Machine Learning and regime-aware modeling can improve market direction prediction by incorporating:
+
+* Historical Bitcoin price data
+* Market volatility information
+* Technical indicators
+* External macroeconomic signals
+* Market regime identification
 
 ---
 
-# Նախագծի Pipeline-ը
+## Project Workflow
 
 ```text
-BTC OHLCV + Fear & Greed + S&P 500 + VIX
-                    ↓
-              Տվյալների մշակում
-                    ↓
-        Exploratory Data Analysis
-                    ↓
-            Feature Engineering
-                    ↓
-             Feature Selection
-                    ↓
-             Train / Test Split
-                    ↓
-          HMM ռեժիմների հայտնաբերում
-                    ↓
-              Մոդելների ուսուցում
-     ├── Logistic Regression
-     ├── LightGBM
-     └── LightGBM + HMM
-                    ↓
-           Արդյունքների գնահատում
-                    ↓
-        Ֆինանսական վերլուծություն
+Bitcoin OHLCV Data
+        +
+External Signals
+(Fear & Greed, VIX, S&P 500)
+                ↓
+         Data Validation
+                ↓
+      Exploratory Data Analysis
+                ↓
+        Feature Engineering
+                ↓
+         Feature Selection
+                ↓
+         Train/Test Split
+                ↓
+     Hidden Markov Model (HMM)
+        Market Regimes
+                ↓
+       Machine Learning Models
+      ├── Logistic Regression
+      ├── LightGBM
+      └── LightGBM + HMM
+                ↓
+        Model Evaluation
+                ↓
+      Strategy Backtesting
+                ↓
+         Monitoring
+                ↓
+          Retraining
+                ↓
+     FastAPI + Docker API
 ```
 
-# Կիրառված մոդելներ
+---
+
+## Data Sources
+
+### Market Data
+
+* Binance API (BTC/USDT OHLCV)
+
+### External Signals
+
+* Fear & Greed Index
+* S&P 500 Index
+* VIX Volatility Index
+
+---
+
+## Feature Engineering
+
+The project generates multiple categories of predictive features, including:
+
+* Trend indicators
+* Momentum indicators
+* Volatility indicators
+* Volume-based features
+* Market sentiment features
+* Time-based features
+* External market signals
+
+Feature selection techniques are then applied to identify the most informative variables for model training.
+
+---
+
+## Models
+
 ### Logistic Regression
 
-Օգտագործվել է որպես բազային գծային մոդել՝ արդյունքների համեմատության համար։
+Used as a baseline linear classification model.
 
 ### Random Forest
 
-Կիրառվել է feature-ների կարևորությունը գնահատելու և Feature Selection իրականացնելու համար։
+Used for feature importance estimation and feature selection.
 
 ### LightGBM
 
-Օգտագործվել է ոչ գծային կապերի հայտնաբերման և ավելի արդյունավետ կանխատեսման համար։
+Gradient boosting model used to capture complex non-linear market relationships.
 
 ### Hidden Markov Model (HMM)
 
-Կիրառվել է շուկայի ռեժիմների հայտնաբերման համար՝ առանձնացնելով աճի, անկման և կայուն շարժի փուլերը։
+Used to identify latent market regimes and volatility states.
 
+### LightGBM + HMM
 
-# Հետազոտության արդյունքները
-
-Արդյունքները ցույց տվեցին, որ LightGBM մոդելը ավելի արդյունավետ է աշխատում, քան Logistic Regression-ը, իսկ HMM ռեժիմային տեղեկատվության ավելացումը բարելավել է կանխատեսման արդյունքները և ռազմավարության կայունությունը։
-
-# Տվյալների աղբյուրներ
-- Binance API
-- Alternative.me Fear & Greed Index
-- Yahoo Finance
-- yfinance
+Final regime-aware model that combines market regime probabilities with engineered features.
 
 ---
 
-<div align="center">
+## Model Monitoring and MLOps
 
-### Հեղինակ՝ Արսեն Հովհաննիսյան
+In addition to model development, the project includes several production-oriented components:
 
-</div>
+* FastAPI inference service
+* Docker containerization
+* Automated model monitoring
+* Performance tracking
+* Retraining pipeline
+* GitHub Actions Continuous Integration (CI)
+
+These components demonstrate how a research model can be transformed into a maintainable production-ready workflow.
+
+---
+
+## Technologies
+
+### Programming
+
+* Python
+
+### Data Science & Machine Learning
+
+* Pandas
+* NumPy
+* Scikit-learn
+* LightGBM
+* hmmlearn
+
+### Visualization
+
+* Matplotlib
+* Seaborn
+
+### Data Sources
+
+* Binance API
+* yfinance
+
+### MLOps
+
+* FastAPI
+* Docker
+* GitHub Actions
+
+---
+
+## Results
+
+The experiments showed that:
+
+* LightGBM significantly outperformed the baseline Logistic Regression model.
+* Incorporating HMM-derived regime information improved prediction quality and model stability.
+* Regime-aware modeling provided more robust performance across different market conditions.
+* Monitoring and retraining pipelines enable continuous evaluation of model performance on newly available data.
+
+---
+
+## Academic Information
+
+**Bachelor's Thesis**
+
+**Title:** Financial Market Analysis Using Artificial Intelligence
+
+**Author:** Arsen Hovhannisyan
+
+**Field:** Applied Mathematics
+
+**University:** National Polytechnic University of Armenia
+
+**Year:** 2026
