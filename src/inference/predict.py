@@ -12,16 +12,7 @@ from src.features.engineering import engineer_features_ml_ready
 from src.models.artifacts import load_production_artifacts
 
 
-ARTIFACTS = load_production_artifacts(input_dir="models")
-
-model = ARTIFACTS["model"]
-hmm_model = ARTIFACTS["hmm_model"]
-hmm_scaler = ARTIFACTS["hmm_scaler"]
-
-selected_features = ARTIFACTS["selected_features"]
-soft_features = ARTIFACTS["soft_features"]
-regime_features = ARTIFACTS["regime_features"]
-metadata = ARTIFACTS["metadata"]
+_ARTIFACTS = None
 
 
 LABEL_MAP = {
@@ -31,17 +22,45 @@ LABEL_MAP = {
 }
 
 
+def get_artifacts():
+    """
+    Lazy-load production artifacts.
+
+    This avoids loading model.pkl during module import,
+    which is important for CI checks where model files may not exist.
+    """
+
+    global _ARTIFACTS
+
+    if _ARTIFACTS is None:
+        _ARTIFACTS = load_production_artifacts(input_dir="models")
+
+    return _ARTIFACTS
+
+
 def predict_single(input_data: dict) -> dict:
     """
     Makes prediction using the saved LightGBM Soft-Regime model.
 
     Steps:
-      1. Convert JSON input to DataFrame
-      2. Select base features
-      3. Create HMM posterior probabilities
-      4. Add posterior features to input
-      5. Predict class and probability
+      1. Load production artifacts
+      2. Convert JSON input to DataFrame
+      3. Select base features
+      4. Create HMM posterior probabilities
+      5. Add posterior features to input
+      6. Predict class and probability
     """
+
+    artifacts = get_artifacts()
+
+    model = artifacts["model"]
+    hmm_model = artifacts["hmm_model"]
+    hmm_scaler = artifacts["hmm_scaler"]
+
+    selected_features = artifacts["selected_features"]
+    soft_features = artifacts["soft_features"]
+    regime_features = artifacts["regime_features"]
+    metadata = artifacts["metadata"]
 
     # -----------------------------
     # 1. Validate input features
@@ -110,6 +129,9 @@ def build_latest_features() -> tuple[dict, str]:
       - Selected features are loaded from features.json.
       - This keeps inference consistent with the trained model.
     """
+
+    artifacts = get_artifacts()
+    selected_features = artifacts["selected_features"]
 
     # -----------------------------
     # 1. Load / download raw BTC data
