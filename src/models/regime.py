@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from hmmlearn.hmm import GaussianHMM
 
-from config import N_REGIMES, REGIME_NAMES, REGIME_COLS_KW, RANDOM_STATE
+from src.config import N_REGIMES, REGIME_NAMES, REGIME_COLS_KW, RANDOM_STATE
 
 
 def _stable_regime_labels(model, train_regimes, test_regimes, vol_col_idx=0):
@@ -110,7 +110,8 @@ def detect_market_regimes_hmm(
     print(f"\n  Transition Matrix:")
     print(trans_df.round(3).to_string())
 
-    return X_train_out, X_test_out, hmm_model, trans_df
+    #return X_train_out, X_test_out, hmm_model, trans_df
+    return X_train_out, X_test_out, hmm_model, scaler, trans_df
 
 
 def extract_posteriors(

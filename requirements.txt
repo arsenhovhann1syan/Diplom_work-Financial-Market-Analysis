@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+lightgbm
+hmmlearn
+joblib
+requests
+yfinance
+optuna

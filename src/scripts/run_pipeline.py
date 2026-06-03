@@ -16,9 +16,9 @@
 #   8.  HMM regime detection
 #   9.  HMM posteriors extraction
 #  10.  Optuna HPO + model training
-#  11.  Walk-forward validation
-#  12.  Backtesting
-# ============================================================
+#  11.  Save production artifacts
+#  12.  Walk-forward validation
+#  13.  Backtesting
 
 import sys
 import os
@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import pandas as pd
 
-from src.config import DATA_START, RANDOM_STATE
+from src.config import DATA_START, RANDOM_STATE, REGIME_COLS_KW
 from src.data.download import load_or_download
 from src.data.validation import validate_and_clean_data
 from src.data.external_signals import get_external_signals
@@ -48,6 +48,7 @@ from src.models.backtest import (
     regime_breakdown,
 )
 from src.pipeline.walk_forward import run_walk_forward, summarise_wfv
+from src.models.artifacts import save_production_artifacts
 
 
 def main():
@@ -91,14 +92,15 @@ def main():
     print(f"\n  Selected features ({len(selected_features)}):")
     for f in selected_features:
         mdi = importance_df.loc[f, "mdi_importance"]
-        pi  = importance_df.loc[f, "pi_importance"]
+        pi = importance_df.loc[f, "pi_importance"]
         print(f"    • {f:<30}  MDI={mdi:.4f}  PI={pi:.4f}")
 
     # ── 8. Regime detection ───────────────────────────────────
     print("\nSTEP 8/12 — HMM regime detection")
-    X_train_reg, X_test_reg, hmm_model, transition_matrix = \
+    X_train_reg, X_test_reg, hmm_model, hmm_scaler, transition_matrix = \
         detect_market_regimes_hmm(
-            X_train_final, X_test_final,
+            X_train_final,
+            X_test_final,
             random_state=RANDOM_STATE,
         )
 
@@ -111,7 +113,7 @@ def main():
         hmm_model, X_train_final, X_test_final
     )
     X_train_soft = pd.concat([X_train_final, train_post_df], axis=1)
-    X_test_soft  = pd.concat([X_test_final,  test_post_df],  axis=1)
+    X_test_soft = pd.concat([X_test_final, test_post_df], axis=1)
 
     print(f"  Base  features : {X_train_final.shape[1]}")
     print(f"  Soft  features : {X_train_soft.shape[1]}  (+3 HMM posteriors)")
@@ -123,13 +125,38 @@ def main():
         random_state=RANDOM_STATE,
     )
     summary_df, results, models = train_and_evaluate(
-        X_train_soft,  X_test_soft,
+        X_train_soft, X_test_soft,
         X_train_final, X_test_final,
         y_train, y_test,
         best_params,
     )
     print("\n  Model comparison (test set):")
     print(summary_df.to_string(index=False))
+
+    # ── Save production artifacts ───────────────────────────────
+    regime_features = [
+        c for c in X_train_final.columns
+        if any(k in c for k in REGIME_COLS_KW)
+    ]
+
+    metadata = {
+        "best_model": "LightGBM Soft-Regime",
+        "base_features_count": len(X_train_final.columns),
+        "soft_features_count": len(X_train_soft.columns),
+        "test_start": str(y_test.index.min().date()),
+        "test_end": str(y_test.index.max().date()),
+    }
+
+    save_production_artifacts(
+        model=models["LightGBM Soft-Regime"],
+        hmm_model=hmm_model,
+        hmm_scaler=hmm_scaler,
+        selected_features=list(X_train_final.columns),
+        soft_features=list(X_train_soft.columns),
+        regime_features=regime_features,
+        metadata=metadata,
+        output_dir="models",
+    )
 
     # ── 11. Walk-forward validation ───────────────────────────
     print("\nSTEP 11/12 — Walk-forward validation")
@@ -142,16 +169,16 @@ def main():
     # ── 12. Backtesting ───────────────────────────────────────
     print("\nSTEP 12/12 — Backtesting")
 
-    test_idx     = y_test.index
+    test_idx = y_test.index
     log_ret_test = df_ml.loc[test_idx, "future_return"]
-    regime_test  = X_test_reg["regime"].values
+    regime_test = X_test_reg["regime"].values
 
-    lgbm_soft   = models["LightGBM Soft-Regime"]
+    lgbm_soft = models["LightGBM Soft-Regime"]
     lgbm_global = models["LightGBM Global"]
 
-    pred_soft    = lgbm_soft.predict(X_test_soft)
-    proba_soft   = lgbm_soft.predict_proba(X_test_soft)
-    pred_global  = lgbm_global.predict(X_test_final)
+    pred_soft = lgbm_soft.predict(X_test_soft)
+    proba_soft = lgbm_soft.predict_proba(X_test_soft)
+    pred_global = lgbm_global.predict(X_test_final)
     proba_global = lgbm_global.predict_proba(X_test_final)
 
     # ── Position builders ─────────────────────────────────────
@@ -170,11 +197,11 @@ def main():
     pos_e.index = log_ret_test.index
 
     # ── Metrics ───────────────────────────────────────────────
-    res_a = calculate_metrics(pos_bah, log_ret_test, "A) Buy & Hold",       0)
-    res_b = calculate_metrics(pos_b,   log_ret_test, "B) Binary LGBM", 0.001)
-    res_c = calculate_metrics(pos_c,   log_ret_test, "C) Confidence",  0.001)
-    res_d = calculate_metrics(pos_d,   log_ret_test, "D) Regime v1",   0.001)
-    res_e = calculate_metrics(pos_e,   log_ret_test, "E) Mixed (C×E)", 0.001)
+    res_a = calculate_metrics(pos_bah, log_ret_test, "A) Buy & Hold", 0)
+    res_b = calculate_metrics(pos_b, log_ret_test, "B) Binary LGBM", 0.001)
+    res_c = calculate_metrics(pos_c, log_ret_test, "C) Confidence", 0.001)
+    res_d = calculate_metrics(pos_d, log_ret_test, "D) Regime v1", 0.001)
+    res_e = calculate_metrics(pos_e, log_ret_test, "E) Mixed (C×E)", 0.001)
 
     all_results = [res_a, res_b, res_c, res_d, res_e]
 
@@ -224,3 +251,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# cd C:\Users\User\Desktop\Diplom_work
+# python -m src.scripts.run_pipeline

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgomp1
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check API import
+        run: |
+          python -c "import api; print('API import OK')"
+
+      - name: Check monitoring import
+        run: |
+          python -c "import monitoring.monitor; print('Monitoring import OK')"
+
+      - name: Check retraining import
+        run: |
+          python -c "import retraining.retrain; print('Retraining import OK')"
+
+      - name: Build Docker image
+        run: |
+          docker build -t bitcoin-api .
