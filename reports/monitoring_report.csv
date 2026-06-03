@@ -1,2 +1,0 @@
-monitor_start,monitor_end,samples,accuracy,precision_macro,recall_macro,f1_macro,min_f1_threshold,status
-2026-03-11 00:00:00,2026-06-02 00:00:00,84,0.4405,0.3535,0.4624,0.3022,0.3,OK
