@@ -142,3 +142,4 @@ def extract_posteriors(
     print(f"  Regime cols used  : {len(regime_cols)}")
     print(f"  Posterior shape   : train={tr_df.shape}  test={te_df.shape}")
     return tr_df, te_df
+

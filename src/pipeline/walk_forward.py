@@ -241,3 +241,4 @@ def summarise_wfv(results_df: pd.DataFrame) -> None:
               f"std={vals.std():.4f}  "
               f"min={vals.min():.4f}  "
               f"max={vals.max():.4f}")
+

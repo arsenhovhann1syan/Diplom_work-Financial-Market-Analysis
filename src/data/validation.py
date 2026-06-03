@@ -65,3 +65,4 @@ def validate_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     print("=" * 60)
 
     return df
+

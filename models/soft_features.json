@@ -1,0 +1,13 @@
+[
+    "momentum_60d",
+    "momentum_1d",
+    "vwap_7d",
+    "momentum_7d",
+    "momentum_21d",
+    "rsi_28",
+    "fg_momentum",
+    "month",
+    "p_low_vol",
+    "p_mid_vol",
+    "p_high_vol"
+]

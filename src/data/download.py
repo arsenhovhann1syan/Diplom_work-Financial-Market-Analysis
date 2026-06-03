@@ -79,3 +79,4 @@ def load_or_download(path: str = RAW_DATA_PATH, **kwargs) -> pd.DataFrame:
         df.to_csv(path, index=False)
         print(f"✅ Data saved to {path}")
     return df
+

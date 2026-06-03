@@ -1,0 +1,13 @@
+[
+    "momentum_60d",
+    "momentum_5d",
+    "spx_5d_return",
+    "bb_zscore_20",
+    "momentum_21d",
+    "vix_change",
+    "day_of_week",
+    "fg_momentum",
+    "p_low_vol",
+    "p_mid_vol",
+    "p_high_vol"
+]
