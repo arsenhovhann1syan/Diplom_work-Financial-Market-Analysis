@@ -42,9 +42,9 @@ External Signals
                 ↓
         Feature Engineering
                 ↓
-         Feature Selection
-                ↓
          Train/Test Split
+                ↓
+         Feature Selection 
                 ↓
      Hidden Markov Model (HMM)
         Market Regimes
