@@ -17,11 +17,10 @@ from src.data.validation import validate_and_clean_data
 from src.data.external_signals import get_external_signals
 from src.features.engineering import engineer_features_ml_ready
 from src.pipeline.split import train_test_split_pipeline
-from src.inference.predict import predict_single
+from src.inference.predict import predict_single, get_artifacts
 
 
 MONITOR_START_DATE = "2026-03-11"
-MIN_F1_THRESHOLD = 0.30
 
 LOG_PATH = "logs/predictions.csv"
 REPORT_PATH = "reports/monitoring_report.csv"
@@ -35,6 +34,32 @@ def label_from_return(value: float, threshold: float) -> int:
     return 0
 
 
+def get_baseline_f1() -> float:
+    """
+    Loads baseline Macro F1 from metadata.json.
+    No hardcoded F1 threshold is used.
+    """
+
+    artifacts = get_artifacts()
+    metadata = artifacts["metadata"]
+
+    possible_f1_keys = [
+        "test_f1_macro",
+        "f1_macro",
+        "macro_f1",
+        "best_f1_macro",
+    ]
+
+    for key in possible_f1_keys:
+        if key in metadata:
+            return float(metadata[key])
+
+    raise KeyError(
+        "Baseline F1 was not found in metadata.json. "
+        "Please make sure metadata contains test_f1_macro, f1_macro, macro_f1, or best_f1_macro."
+    )
+
+
 def main():
     print("=" * 60)
     print("MODEL MONITORING")
@@ -42,6 +67,14 @@ def main():
 
     os.makedirs("logs", exist_ok=True)
     os.makedirs("reports", exist_ok=True)
+
+    # -----------------------------
+    # 0. Load baseline F1
+    # -----------------------------
+    print("\n[0/6] Loading baseline metric...")
+    baseline_f1 = get_baseline_f1()
+
+    print(f"Baseline Macro F1: {baseline_f1:.4f}")
 
     # -----------------------------
     # 1. Download fresh Binance data
@@ -127,6 +160,10 @@ def main():
     recall = recall_score(y_true, y_pred, average="macro", zero_division=0)
     f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
 
+    f1_drop = baseline_f1 - f1
+
+    status = "OK" if f1 >= baseline_f1 else "RETRAINING_REQUIRED"
+
     report_df = pd.DataFrame([{
         "monitor_start": str(pred_df["date"].min()),
         "monitor_end": str(pred_df["date"].max()),
@@ -135,8 +172,9 @@ def main():
         "precision_macro": round(precision, 4),
         "recall_macro": round(recall, 4),
         "f1_macro": round(f1, 4),
-        "min_f1_threshold": MIN_F1_THRESHOLD,
-        "status": "OK" if f1 >= MIN_F1_THRESHOLD else "RETRAINING_REQUIRED",
+        "baseline_f1": round(baseline_f1, 4),
+        "f1_drop": round(f1_drop, 4),
+        "status": status,
     }])
 
     report_df.to_csv(REPORT_PATH, index=False)
@@ -146,8 +184,8 @@ def main():
     print("=" * 60)
     print(report_df.to_string(index=False))
 
-    if f1 < MIN_F1_THRESHOLD:
-        print("\n⚠️ Warning: retraining required")
+    if status == "RETRAINING_REQUIRED":
+        print("\n⚠️ Warning: model performance dropped below baseline")
     else:
         print("\n✅ Model performance is acceptable")
 
@@ -157,6 +195,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
- 
